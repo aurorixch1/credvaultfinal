@@ -1,3 +1,5 @@
+'use client'
+
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export const CustomConnectButton = () => {
@@ -12,37 +14,48 @@ export const CustomConnectButton = () => {
         mounted,
       }) => {
         return (
-          <div className="w-full">
+          <div
+            {...(!mounted && {
+              'aria-hidden': true,
+              style: {
+                opacity: 0,
+                pointerEvents: 'none',
+                userSelect: 'none',
+              },
+            })}
+          >
             {(() => {
               if (!mounted || !account || !chain) {
                 return (
                   <button
                     onClick={openConnectModal}
-                    className="w-full py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    className="px-6 py-3 bg-gradient-to-r from-[#6D28D9] to-[#1E1E2E] text-white rounded-lg
+                    hover:from-[#FACC15] hover:to-[#FACC15] transition-all duration-300
+                    shadow-lg hover:shadow-[#FACC15]/20 font-semibold
+                    border border-transparent hover:border-[#FACC15]/50"
                   >
                     Connect Wallet
                   </button>
                 )
               }
-
-              if (chain.unsupported) {
-                return (
+              return (
+                <div className="flex items-center gap-4">
                   <button
                     onClick={openChainModal}
-                    className="w-full py-3 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    className="px-4 py-2 bg-[#1E1E2E] text-[#FACC15] rounded-lg
+                    hover:bg-[#FACC15] hover:text-[#1E1E2E] transition-all duration-300
+                    border border-[#FACC15]/50"
                   >
-                    Wrong network
+                    {chain.name}
                   </button>
-                )
-              }
-
-              return (
-                <button
-                  onClick={openAccountModal}
-                  className="w-full py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  {account.displayName}
-                </button>
+                  <button
+                    onClick={openAccountModal}
+                    className="px-4 py-2 bg-gradient-to-r from-[#6D28D9] to-[#1E1E2E] text-white rounded-lg
+                    hover:from-[#FACC15] hover:to-[#FACC15] transition-all duration-300"
+                  >
+                    {account.displayName}
+                  </button>
+                </div>
               )
             })()}
           </div>

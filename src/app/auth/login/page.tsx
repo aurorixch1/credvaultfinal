@@ -1,37 +1,24 @@
 'use client'
 
-import { AuthLayout } from '@/components/auth/AuthLayout'
 import { CustomConnectButton } from '@/components/auth/ConnectButton'
-import { useAccount } from 'wagmi'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { motion } from 'framer-motion'
 
 export default function Login() {
-  const { isConnected } = useAccount()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (isConnected) {
-      router.push('/dashboard')
-    }
-  }, [isConnected, router])
-
   return (
-    <AuthLayout>
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium text-gray-900">Sign in to CredVault</h3>
-          <p className="mt-1 text-sm text-gray-500">
+    <div className="min-h-screen bg-gradient-to-br from-[#1E1E2E] to-[#6D28D9] flex items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl w-full max-w-md"
+      >
+        <h2 className="text-3xl font-bold text-white mb-8 text-center">Welcome Back</h2>
+        <div className="space-y-6">
+          <CustomConnectButton />
+          <p className="text-center text-[#F8FAFC]/60 text-sm">
             Connect your wallet to access your credentials
           </p>
         </div>
-        <CustomConnectButton />
-        <div className="text-sm text-center">
-          <a href="#" className="text-indigo-600 hover:text-indigo-500">
-            Learn more about Web3 wallets
-          </a>
-        </div>
-      </div>
-    </AuthLayout>
+      </motion.div>
+    </div>
   )
 }
