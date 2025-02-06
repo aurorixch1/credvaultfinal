@@ -17,8 +17,8 @@ export const useAuth = () => {
         statement: 'Sign in with Ethereum to CredVault',
         uri: window.location.origin,
         version: '1',
-        chainId: 1,
-        nonce: Math.random().toString(36).slice(2)
+        chainId: 43113,
+        nonce: await fetch('/api/auth/nonce').then(res => res.text())
       })
 
       const signature = await signMessageAsync({
