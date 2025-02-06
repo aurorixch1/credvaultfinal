@@ -3,9 +3,17 @@
 import { CustomConnectButton } from '@/components/auth/ConnectButton'
 import { Shield, Lock, CheckCircle, Key } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
 import { Footer } from '@/components/layout/Footer'
 
 export default function Home() {
+  const { signIn } = useAuth()
+  const router = useRouter()
+
+  const handleGetStarted = () => {
+    router.push('/auth/signup')
+  }
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#1E1E2E] to-[#6D28D9]">
       <div className="container mx-auto px-4 py-16">
@@ -33,6 +41,22 @@ export default function Home() {
           <div className="max-w-xs mx-auto transform hover:scale-105 transition-transform duration-300">
             <CustomConnectButton />
           </div>
+
+          <div className="flex space-x-4 justify-center">
+        <motion.button
+          onClick={signIn}
+          className="px-6 py-3 bg-[#6D28D9] text-white rounded-lg hover:bg-[#FACC15]"
+        >
+          Login
+        </motion.button>
+        
+        <motion.button
+          onClick={handleGetStarted}
+          className="px-6 py-3 bg-[#FACC15] text-[#1E1E2E] rounded-lg hover:bg-[#6D28D9] hover:text-white"
+        >
+          Get Started
+        </motion.button>
+      </div>
 
           <div className="grid md:grid-cols-3 gap-8 mt-16">
             <FeatureCard

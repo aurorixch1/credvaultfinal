@@ -1,42 +1,78 @@
+import { useState, useCallback } from 'react'
+import { SiweMessage } from 'siwe'
 import { useAccount, useSignMessage } from 'wagmi'
 import { useRouter } from 'next/navigation'
-import { SiweMessage } from 'siwe'
-import { signIn as signInAuth } from 'next-auth/react'
 
-export function useAuth() {
+export const useAuth = () => {
   const { address } = useAccount()
   const { signMessageAsync } = useSignMessage()
   const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  const signIn = async () => {
+  const signIn = useCallback(async () => {
     try {
       const message = new SiweMessage({
         domain: window.location.host,
-        address,
+        address: address,
         statement: 'Sign in with Ethereum to CredVault',
         uri: window.location.origin,
         version: '1',
-        chainId: 80001, // Mumbai testnet
-        nonce: await fetch('/api/auth/nonce').then(res => res.text())
+        chainId: 1,
+        nonce: Math.random().toString(36).slice(2)
       })
 
       const signature = await signMessageAsync({
         message: message.prepareMessage()
       })
 
-      const response = await signInAuth('credentials', {
-        message: JSON.stringify(message),
-        signature,
-        redirect: false,
+      const response = await fetch('http://localhost:5000/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address, signature })
       })
 
-      if (response?.ok) {
+      const data = await response.json()
+      if (data.token) {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        setIsAuthenticated(true)
         router.push('/dashboard')
+        return true
       }
+      return false
     } catch (error) {
       console.error('Error signing in:', error)
+      return false
+    }
+  }, [address, signMessageAsync, router])
+
+  const signUp = async (userData: any) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...userData, walletAddress: address })
+      })
+
+      const data = await response.json()
+      if (data.token) {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        setIsAuthenticated(true)
+        router.push('/dashboard')
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Error signing up:', error)
+      return false
     }
   }
 
-  return { signIn, address }
+  return {
+    isAuthenticated,
+    signIn,
+    signUp,
+    address
+  }
 }
