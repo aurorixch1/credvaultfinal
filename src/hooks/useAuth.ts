@@ -11,14 +11,17 @@ export const useAuth = () => {
 
   const signIn = useCallback(async () => {
     try {
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address: address,
-        statement: 'Sign in with Ethereum to CredVault',
-        uri: window.location.origin,
-        version: '1',
-        chainId: 43113,
-        nonce: await fetch('/api/auth/nonce').then(res => res.text())
+      const nonce = Math.random().toString(36).substring(2, 10);
+    
+    const message = new SiweMessage({
+      domain: window.location.host,
+      address: address,
+      statement: 'Sign in with Ethereum to CredVault',
+      uri: window.location.origin,
+      version: '1',
+      chainId: 1,
+      nonce: nonce
+
       })
 
       const signature = await signMessageAsync({
