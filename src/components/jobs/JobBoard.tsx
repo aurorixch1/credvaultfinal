@@ -16,6 +16,7 @@ interface Job {
 
 export default function JobBoard() {
   const [jobs, setJobs] = useState<Job[]>([])
+  const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({
     search: '',
     salary: '',
@@ -29,11 +30,14 @@ export default function JobBoard() {
 
   const fetchJobs = async () => {
     try {
+      setLoading(true)
       const response = await fetch('/api/jobs?' + new URLSearchParams(filters))
       const data = await response.json()
       setJobs(data.jobs)
     } catch (error) {
       console.error('Error fetching jobs:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -42,25 +46,25 @@ export default function JobBoard() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-4">Job Board</h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <SearchFilter 
+          <SearchFilter
             icon={<Search />}
             placeholder="Search jobs..."
             value={filters.search}
             onChange={(value: string) => setFilters({...filters, search: value})}
           />
-          <SearchFilter 
+          <SearchFilter
             icon={<DollarSign />}
             placeholder="Salary range"
             value={filters.salary}
             onChange={(value: string) => setFilters({...filters, salary: value})}
           />
-          <SearchFilter 
+          <SearchFilter
             icon={<Building2 />}
             placeholder="Company"
             value={filters.company}
             onChange={(value: string) => setFilters({...filters, company: value})}
           />
-          <SearchFilter 
+          <SearchFilter
             icon={<Briefcase />}
             placeholder="Job type"
             value={filters.type}
@@ -69,11 +73,23 @@ export default function JobBoard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {jobs.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-white text-xl"
+          >
+            Loading jobs...
+          </motion.div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {jobs.map((job) => (
+            <JobCard key={job.id} job={job} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -90,6 +106,7 @@ const SearchFilter = ({ icon, placeholder, value, onChange }: { icon: React.Reac
     />
   </div>
 )
+
 const JobCard = ({ job }: { job: Job }) => (
   <motion.div
     whileHover={{ scale: 1.02 }}
